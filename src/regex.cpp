@@ -22,6 +22,7 @@ chainz<cname> raw::captures()const {
 }
 
 opt::opt( $regex re ):sub(re){}
+opt::opt( const std::string& str ):opt(gentml::raw(str)){}
 opt::operator std::__cxx11::string()const {
     if( !sub ) die("sub expression missing");
     return (m_name?"(":"(?:") + (std::string)*sub + ")?";
@@ -32,6 +33,8 @@ chainz<cname> opt::captures()const {
     ret += sub->captures();
     return ret;
 }
+ops& ops::construct( int i, const std::string& str ) {return $regexs::construct( i, gentml::raw(str) ), *this;}
+ops& ops::construct( int i, $regex reg ) {return $regexs::construct( i, reg ), *this;}
 
 ops::ops($regexs exprs):$regexs(exprs){}
 ops::operator std::__cxx11::string()const {
@@ -51,6 +54,7 @@ chainz<cname> ops::captures()const {
 }
 
 any::any($regex expr):sub(expr){}
+any::any( const std::string& str ):any(gentml::raw(str)){}
 any::operator std::__cxx11::string()const {
     if( !sub ) die("sub expression missing");
     std::string ret = m_name?"(":"(?:";
@@ -67,6 +71,7 @@ chainz<cname> any::captures()const {
 }
 
 one::one($regex expr):sub(expr){}
+one::one( const std::string& str ):one(gentml::raw(str)){}
 one::operator std::__cxx11::string()const {
     if( !sub ) die("sub expression missing");
     std::string ret = m_name?"(":"(?:";
@@ -83,6 +88,7 @@ chainz<cname> one::captures()const {
 }
 
 apo::apo($regex expr):sub(expr){}
+apo::apo( const std::string& str ):apo(gentml::raw(str)){}
 apo::operator std::__cxx11::string()const {
     if( !sub ) die("sub expression missing");
     if( m_name ) die("name forbidden");
@@ -93,6 +99,7 @@ chainz<cname> apo::captures()const {
 }
 
 ane::ane($regex expr):sub(expr){}
+ane::ane( const std::string& str ):ane(gentml::raw(str)){}
 ane::operator std::__cxx11::string()const {
     if( !sub ) die("sub expression missing");
     if( m_name ) die("name forbidden");
@@ -103,6 +110,7 @@ chainz<cname> ane::captures()const {
 }
 
 bpo::bpo($regex expr):sub(expr){}
+bpo::bpo( const std::string& str ):bpo(gentml::raw(str)){}
 bpo::operator std::__cxx11::string()const {
     if( !sub ) die("sub expression missing");
     if( m_name ) die("name forbidden");
@@ -113,6 +121,7 @@ chainz<cname> bpo::captures()const {
 }
 
 bne::bne($regex expr):sub(expr){}
+bne::bne( const std::string& str ):bne(gentml::raw(str)){}
 bne::operator std::__cxx11::string()const {
     if( !sub ) die("sub expression missing");
     if( m_name ) die("name forbidden");
@@ -137,6 +146,8 @@ chainz<cname> cat::captures()const {
     for( auto sub : *this ) ret += sub->captures();
     return ret;
 }
+cat& cat::construct( int i, const std::string& str ) {return $regexs::construct( i, gentml::raw(str) ), *this;}
+cat& cat::construct( int i, $regex reg ) {return $regexs::construct( i, reg ), *this;}
 
 sat::sat($regexs exprs):$regexs(exprs){}
 sat::operator std::__cxx11::string()const {
@@ -153,6 +164,8 @@ chainz<cname> sat::captures()const {
     for( auto sub : *this ) ret += sub->captures();
     return ret;
 }
+sat& sat::construct( int i, const std::string& str ) {return $regexs::construct( i, gentml::raw(str) ), *this;}
+sat& sat::construct( int i, $regex reg ) {return $regexs::construct( i, reg ), *this;}
 
 sst::sst($regexs exprs):$regexs(exprs){}
 sst::operator std::__cxx11::string()const {
@@ -169,6 +182,8 @@ chainz<cname> sst::captures()const {
     for( auto sub : *this ) ret += sub->captures();
     return ret;
 }
+sst& sst::construct( int i, const std::string& str ) {return $regexs::construct( i, gentml::raw(str) ), *this;}
+sst& sst::construct( int i, $regex reg ) {return $regexs::construct( i, reg ), *this;}
 
 }
 

@@ -16,6 +16,7 @@ pattern* pattern::comment(const std::string& c ) {
 namespace gentml::p {
 
 match::match($regex ex):expr(ex){}
+match::match(const std::string& str ):match(raw(str)){}
 match::operator json()const {
     if( !expr ) die("expression missing");
     json obj = json::object;
@@ -78,8 +79,16 @@ range* range::begin($regex reg) {
     m_begin = reg;
     return this;
 }
+range* range::begin( const std::string& str ) {
+    m_begin = raw(str);
+    return this;
+}
 range* range::end($regex reg) {
     m_end = reg;
+    return this;
+}
+range* range::end( const std::string& str ) {
+    m_end = raw(str);
     return this;
 }
 range* range::name(cname cn) {

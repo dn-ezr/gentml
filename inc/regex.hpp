@@ -46,6 +46,7 @@ struct opt : public regex {
     $regex sub;
 
     opt($regex re = nullptr);
+    opt( const std::string& str );
 
     operator std::string()const override;
 
@@ -63,6 +64,9 @@ struct ops : public regex, public $regexs {
     operator std::string()const override;
 
     chainz<cname> captures()const override;
+
+    ops& construct( int i, const std::string& str );
+    ops& construct( int i, $regex reg );
 };
 
 struct any : public regex {
@@ -70,6 +74,7 @@ struct any : public regex {
     $regex sub;
 
     any($regex expr = nullptr);
+    any( const std::string& str );
 
     operator std::string()const override;
 
@@ -81,6 +86,7 @@ struct one : public regex {
     $regex sub;
 
     one($regex expr = nullptr);
+    one( const std::string& str );
 
     operator std::string()const override;
 
@@ -94,6 +100,7 @@ struct apo : public regex {
     $regex sub;
 
     apo($regex expr = nullptr);
+    apo( const std::string& str );
 
     operator std::string()const override;
 
@@ -107,6 +114,7 @@ struct ane : public regex {
     $regex sub;
 
     ane($regex expr = nullptr);
+    ane( const std::string& str );
 
     operator std::string()const override;
 
@@ -120,6 +128,7 @@ struct bpo : public regex {
     $regex sub;
 
     bpo($regex expr = nullptr);
+    bpo( const std::string& str );
 
     operator std::string()const override;
 
@@ -133,6 +142,7 @@ struct bne : public regex {
     $regex sub;
 
     bne($regex expr = nullptr);
+    bne( const std::string& str );
 
     operator std::string()const override;
 
@@ -148,6 +158,9 @@ struct cat : public regex, public $regexs {
     operator std::string()const override;
 
     chainz<cname> captures()const override;
+
+    cat& construct( int i, const std::string& str );
+    cat& construct( int i, $regex reg );
 };
 
 /**
@@ -161,6 +174,9 @@ struct sat : public regex, public $regexs {
     operator std::string()const override;
 
     chainz<cname> captures()const override;
+
+    sat& construct( int i, const std::string& str );
+    sat& construct( int i, $regex reg );
 };
 
 /**
@@ -174,6 +190,9 @@ struct sst : public regex, public $regexs {
     operator std::string()const override;
 
     chainz<cname> captures()const override;
+
+    sst& construct( int i, const std::string& str );
+    sst& construct( int i, $regex reg );
 };
 
 }

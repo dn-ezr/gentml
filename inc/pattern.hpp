@@ -44,6 +44,7 @@ struct match : public pattern {
     cname m_name;
 
     match( $regex m = nullptr );
+    match( const std::string& str );
 
     operator json()const override;
 
@@ -69,10 +70,12 @@ struct range : public pattern {
     /**
      * @method begin : 设置起始正则表达式 */
     range* begin($regex);
+    range* begin( const std::string& str );
 
     /**
      * @method end : 设置终止正则表达式 */
     range* end($regex);
+    range* end( const std::string& str );
 
     /**
      * @method name : 设置名称 */

@@ -17,8 +17,6 @@ class Alioth : public Tml {
         $patterns global_definitions();
         $patterns inner_definitions();
         $patterns implementations();
-
-        $pattern basic_type();
         $pattern class_definition();
         $pattern alias_definition();
         $pattern enum_definition();
@@ -27,6 +25,14 @@ class Alioth : public Tml {
 
         $pattern method_implementation();
         $pattern operator_implementation();
+
+        $regex operators();
+        $regex dtypes();
+        $regex etypes();
+        $regex visibilities();
+        $regex scopes();
+        $regex bnd($regex);
+        $regex bnd(const std::string&);
 
     public:
         Alioth();

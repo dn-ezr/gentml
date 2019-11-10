@@ -6,7 +6,7 @@ date: 2019/11/7
 
 # GentmL
 
-The project `GentmL` means generate `tmLanguage` configure file. The major purpose of this project is to generate `json` formated `tmLanguage` configuration file for the vscode `IDE`.
+The project `GentmL` means generate `tmLanguage` configure file. The major purpose of this project is to generate `json` formated `tmLanguage` configuration file for the vscode `IDE`. It makes you write the regular expressions more structural, so that you can work on more complicated syntaxs.
 
 ## Usage
 

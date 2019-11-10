@@ -26,40 +26,32 @@ Alioth::Alioth() {
 }
 
 $regex Alioth::label() {
-    return one(
-        ops(
-            raw("\\w"),
-            raw("_")));
+    return one(ops("\\w","_"));
 }
 
 $regex Alioth::space() {
-    return one(
-        raw("\\s"));
+    return one("\\s");
 }
 
 $regex Alioth::tag() {
-    return one(
-        ops(
-            raw("\\w"),
-            raw("-"),
-            raw("_")));
+    return one(ops("\\w","-","_"));
 }
 
 $patterns Alioth::comments() {
     return {
-        match(raw("//.*"))
+        match("//.*")
             ->name(&n::comment.line.double_slash),
         range()
-            ->begin(raw("/\\*\\*doc"))
-            ->end(raw("end\\*\\*/"))
+            ->begin("/\\*\\*doc")
+            ->end("end\\*\\*/")
             ->name(&n::comment.block)
             ->contentName(&n::comment.block.documentation)
             ->patterns({
                 include("text.html.markdown")
             }),
         range()
-            ->begin(raw("/\\*\\*"))
-            ->end(raw("\\*/"))
+            ->begin("/\\*\\*")
+            ->end("\\*/")
             ->name(&n::comment.block)
             ->contentName(&n::comment.block.documentation)
             ->patterns({
@@ -69,12 +61,12 @@ $patterns Alioth::comments() {
                         tag()->name(&n::storage.type),
                         space(),
                         cat(
-                            raw(".*"),
+                            ".*",
                             apo(raw(": ")))->name(&n::entity.name.function),
-                        raw(":")))}),
+                        ":"))}),
         range()
-            ->begin(raw("/\\*"))
-            ->end(raw("\\*/"))
+            ->begin("/\\*")
+            ->end("\\*/")
             ->name(&n::comment.block)
             ->contentName(&n::comment.block.documentation)
     };
@@ -85,24 +77,23 @@ $patterns Alioth::signature() {
         range()
             ->begin(
                 sat(
-                    raw("module")->name(&n::keyword),
-                    space(),
+                    bnd("module")->name(&n::keyword),
                     label()->name(&n::entity.name),
                     opt(
                         sst(
-                            raw("entry")->name(&n::keyword),
+                            bnd("entry")->name(&n::keyword),
                             label()->name(&n::entity.name.tag))),
                     opt(
                         raw(":")->name(&n::keyword))))
             ->end(
                 apo(
                     ops(
-                        raw("class"),
-                        raw("method"),
-                        raw("operator"),
-                        raw("enum"),
-                        raw("let"),
-                        raw(";"))))
+                        "class",
+                        "method",
+                        "operator",
+                        "enum",
+                        "let",
+                        ";")))
             ->patterns({
                 include("#dependencies")
             })
@@ -115,15 +106,15 @@ $patterns Alioth::dependencies() {
             sat(
                 raw("as")->name(&n::keyword),
                 ops(
-                    sat(raw("this"),raw("module"))->name(&n::constant.language),
+                    sat("this","module")->name(&n::constant.language),
                     label()->name(&n::entity.name)))),
         match(
             sat(
                 raw("@")->name(&n::keyword),
                 ops(
                     label(),
-                    raw(R"(\"[^\"]+\")"),
-                    raw(R"(\'[^\']+\')"))
+                    R"(\"[^\"]+\")",
+                    R"(\'[^\']+\')")
             ->name(&n::string.interpolated))),
         match(label()->name(&n::support.clas))
     };
@@ -151,86 +142,30 @@ $patterns Alioth::implementations() {
     };
 }
 
-$pattern Alioth::basic_type() {
-    return match(
-        cat(
-            ops(
-                opt(
-                    raw("u")),
-                raw("int"),
-                ops(
-                    raw("8"),
-                    raw("16"),
-                    raw("32"),
-                    raw("64")),
-                cat(
-                    raw("float"),
-                    ops(
-                        raw("32"),
-                        raw("64"))),
-                raw("bool"),
-                raw("void")),
-            raw("\\b")))->name(&n::storage.type);
-}
-
 $pattern Alioth::class_definition() {
     return range()
         ->begin(
             sat(
-                raw("class")->name(&n::storage.type),
-                space(),
+                bnd("class")->name(&n::storage.type),
                 any(
                     sst(
                         ops(
-                            raw("abstract"),
-                            raw("public"),
-                            raw("protected"),
-                            raw("private"),
-                            raw("\\+"),
-                            raw("\\-"),
-                            raw("\\*"))))->name(&n::storage.modifier),
+                            "abstract",
+                            visibilities())))->name(&n::storage.modifier),
                 label()->name(&n::entity.name.type)))
-        ->end(bpo(raw("\\}")))
+        ->end(bpo("\\}"))
         ->name(&n::meta)
         ->patterns({
-            match(
-                ops(
-                    raw("\\<"),
-                    raw("\\>"),
-                    raw("\\["),
-                    raw("\\]"),
-                    raw("\\:"),
-                    raw("\\="),
-                    raw("\\!"),
-                    raw("and"),
-                    raw(",")))->name(&n::keyword.operato),
-            match(
-                ops(
-                    raw("int8"),
-                    raw("int16"),
-                    raw("int32"),
-                    raw("int64"),
-                    raw("uint8"),
-                    raw("uint16"),
-                    raw("uint32"),
-                    raw("uint64"),
-                    raw("float32"),
-                    raw("float64"),
-                    raw("bool"),
-                    raw("void")))->name(&n::storage.type),
-            match(
-                ops(
-                    raw("obj"),
-                    raw("ptr"),
-                    raw("ref"),
-                    raw("rel")))->name(&n::support.type),
-            match(
-                label())->name(&n::entity.name.section),
+            match(scopes())->name(&n::constant.character.escape),
+            match(operators())->name(&n::keyword.operato),
+            match(dtypes())->name(&n::storage.type),
+            match(etypes())->name(&n::support.type),
+            match(label())->name(&n::entity.name.section),
             range()
                 ->begin(
-                    raw("\\{")->name(&n::keyword.other))
+                    raw("\\{")->name(&n::keyword.control))
                 ->end(
-                    raw("\\}")->name(&n::keyword.other))
+                    raw("\\}")->name(&n::keyword.control))
                 ->patterns({
                     include("#global-definitions"),
                     include("#inner-definitions")
@@ -239,28 +174,137 @@ $pattern Alioth::class_definition() {
 }
 
 $pattern Alioth::alias_definition() {
-    return match(raw("let"))->name(&n::storage.type);
+    return range()
+        ->begin(
+            sat(
+                bnd("let")->name(&n::storage.type),
+                visibilities()->name(&n::storage.modifier),
+                label()->name(&n::support.clas),
+                raw("=")->name(&n::keyword.operato)))
+        ->end(
+            apo("class|let|enum|method|operator|var|obj|ptr|ref|rel|\\}|\\d"))
+        ->patterns({
+            match(scopes())->name(&n::constant.character.escape),
+            match(operators())->name(&n::keyword.operato),
+            match(dtypes())->name(&n::storage.type),
+            match(etypes())->name(&n::support.type),
+            match(label())->name(&n::support.clas)
+        });
 }
 
 $pattern Alioth::enum_definition() {
-    return match(raw("enum"))->name(&n::storage.type);
+    // return match(raw("enum"))->name(&n::storage.type);
+    return range()
+        ->begin(bnd("enum")->name(&n::storage.type))
+        ->end(bpo("\\}"));
 }
 
 $pattern Alioth::method_definition() {
-    return match(raw("method"))->name(&n::storage.type);
+    return match(bnd("method"))->name(&n::storage.type);
 }
 
 $pattern Alioth::operator_definition() {
-    return match(raw("operator"))->name(&n::storage.type);
+    return match(bnd("operator"))->name(&n::storage.type);
 }
 
 $pattern Alioth::method_implementation() {
-    return match(raw("method"))->name(&n::storage.type);
+    return match(bnd("method"))->name(&n::storage.type);
 }
 
 $pattern Alioth::operator_implementation() {
-    return match(raw("operator"))->name(&n::storage.type);
+    return match(bnd("operator"))->name(&n::storage.type);
 }
 
+$regex Alioth::operators() {
+    return ops(
+        "\\~",
+        "\\!",
+        "\\@",
+        "\\#",
+        "\\$",
+        "\\%",
+        "\\^",
+        "\\&",
+        "\\*",
+        "\\-",
+        "\\+",
+        "\\=",
+        "\\|",
+        "\\<",
+        "\\>",
+        "\\?",
+        "\\/",
+        bnd("and"),
+        bnd("or"),
+        bnd("not"),
+        bnd("xor")
+    );
+}
+
+$regex Alioth::dtypes() {
+    return ops(
+        ops(
+            bnd("int8"),
+            bnd("int16"),
+            bnd("int32"),
+            bnd("int64"),
+            bnd("uint8"),
+            bnd("uint16"),
+            bnd("uint32"),
+            bnd("uint64"),
+            bnd("float32"),
+            bnd("float64"),
+            bnd("bool"),
+            bnd("void"))
+    );
+}
+
+$regex Alioth::etypes() {
+    return ops(
+        bnd("var"),
+        bnd("obj"),
+        bnd("ptr"),
+        bnd("ref"),
+        bnd("rel")
+    );
+}
+
+$regex Alioth::visibilities() {
+    return ops(
+        bnd("public"),
+        bnd("private"),
+        bnd("protected"),
+        "\\+",
+        "\\-",
+        "\\*"
+    );
+}
+
+$regex Alioth::scopes() {
+    return ops(
+        "\\-\\>",
+        "\\.",
+        "\\:\\:",
+        "\\(",
+        "\\)",
+        "\\[",
+        "\\]",
+        "\\{",
+        "\\}",
+        "\\:",
+        "\\;",
+        "\\,"
+    );
+}
+
+$regex Alioth::bnd($regex expr) {
+    return cat(
+        expr,
+        apo("\\b")
+    );
+}
+$regex Alioth::bnd(const std::string& s) {
+    return bnd(raw(s));
+}
 
 #endif
