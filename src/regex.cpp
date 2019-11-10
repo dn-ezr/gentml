@@ -21,20 +21,20 @@ chainz<cname> raw::captures()const {
     else return {};
 }
 
-optional::optional( $regex re ):sub(re){}
-optional::operator std::__cxx11::string()const {
+opt::opt( $regex re ):sub(re){}
+opt::operator std::__cxx11::string()const {
     if( !sub ) die("sub expression missing");
     return (m_name?"(":"(?:") + (std::string)*sub + ")?";
 }
-chainz<cname> optional::captures()const {
+chainz<cname> opt::captures()const {
     chainz<cname> ret;
     if( m_name ) ret << m_name;
     ret += sub->captures();
     return ret;
 }
 
-options::options($regexs exprs):$regexs(exprs){}
-options::operator std::__cxx11::string()const {
+ops::ops($regexs exprs):$regexs(exprs){}
+ops::operator std::__cxx11::string()const {
     if( size() == 0 ) die("empty option list");
     for( auto sub : *this ) if( !sub ) die("invalid option");
     std::string ret = m_name?"(":"(?:";
@@ -43,15 +43,15 @@ options::operator std::__cxx11::string()const {
     ret += ")";
     return ret;
 }
-chainz<cname> options::captures()const {
+chainz<cname> ops::captures()const {
     chainz<cname> ret;
     if( m_name ) ret << m_name;
     for( auto sub : *this ) ret += sub->captures();
     return ret;
 }
 
-kleene::kleene($regex expr):sub(expr){}
-kleene::operator std::__cxx11::string()const {
+any::any($regex expr):sub(expr){}
+any::operator std::__cxx11::string()const {
     if( !sub ) die("sub expression missing");
     std::string ret = m_name?"(":"(?:";
     ret += "(?:";
@@ -59,15 +59,15 @@ kleene::operator std::__cxx11::string()const {
     ret += ")*)";
     return ret;
 }
-chainz<cname> kleene::captures()const {
+chainz<cname> any::captures()const {
     chainz<cname> ret;
     if( m_name ) ret << m_name;
     ret += sub->captures();
     return ret;
 }
 
-positive::positive($regex expr):sub(expr){}
-positive::operator std::__cxx11::string()const {
+one::one($regex expr):sub(expr){}
+one::operator std::__cxx11::string()const {
     if( !sub ) die("sub expression missing");
     std::string ret = m_name?"(":"(?:";
     ret += "(?:";
@@ -75,26 +75,98 @@ positive::operator std::__cxx11::string()const {
     ret += ")+)";
     return ret;
 }
-chainz<cname> positive::captures()const {
+chainz<cname> one::captures()const {
     chainz<cname> ret;
     if( m_name ) ret << m_name;
     ret += sub->captures();
     return ret;
 }
 
-cat::cat($regexs exprs):subs(exprs){}
+apo::apo($regex expr):sub(expr){}
+apo::operator std::__cxx11::string()const {
+    if( !sub ) die("sub expression missing");
+    if( m_name ) die("name forbidden");
+    return "(?=" + (std::string)*sub + ")";
+}
+chainz<cname> apo::captures()const {
+    return sub->captures();
+}
+
+ane::ane($regex expr):sub(expr){}
+ane::operator std::__cxx11::string()const {
+    if( !sub ) die("sub expression missing");
+    if( m_name ) die("name forbidden");
+    return "(?!" + (std::string)*sub + ")";
+}
+chainz<cname> ane::captures()const {
+    return sub->captures();
+}
+
+bpo::bpo($regex expr):sub(expr){}
+bpo::operator std::__cxx11::string()const {
+    if( !sub ) die("sub expression missing");
+    if( m_name ) die("name forbidden");
+    return "(?<=" + (std::string)*sub + ")";
+}
+chainz<cname> bpo::captures()const {
+    return sub->captures();
+}
+
+bne::bne($regex expr):sub(expr){}
+bne::operator std::__cxx11::string()const {
+    if( !sub ) die("sub expression missing");
+    if( m_name ) die("name forbidden");
+    return "(?<!" + (std::string)*sub + ")";
+}
+chainz<cname> bne::captures()const {
+    return sub->captures();
+}
+
+cat::cat($regexs exprs):$regexs(exprs){}
 cat::operator std::__cxx11::string()const {
-    if( subs.size() == 0 ) die("empty cat list");
-    for( auto sub : subs ) if( !sub ) die("invalid cat unit");
+    if( size() == 0 ) die("empty cat list");
+    for( auto sub : *this ) if( !sub ) die("invalid cat unit");
     std::string ret = m_name?"(":"(?:";
-    for( auto sub : subs ) ret += *sub;
+    for( auto sub : *this ) ret += *sub;
     ret += ")";
     return ret;
 }
 chainz<cname> cat::captures()const {
     chainz<cname> ret;
     if( m_name ) ret << m_name;
-    for( auto sub : subs ) ret += sub->captures();
+    for( auto sub : *this ) ret += sub->captures();
+    return ret;
+}
+
+sat::sat($regexs exprs):$regexs(exprs){}
+sat::operator std::__cxx11::string()const {
+    if( size() == 0 ) die("empty cat list");
+    for( auto sub : *this ) if( !sub ) die("invalid cat unit");
+    std::string ret = m_name?"(":"(?:";
+    for( auto sub : *this ) ret += (std::string)*sub + "(?:\\s*)";
+    ret += ")";
+    return ret;
+}
+chainz<cname> sat::captures()const {
+    chainz<cname> ret;
+    if( m_name ) ret << m_name;
+    for( auto sub : *this ) ret += sub->captures();
+    return ret;
+}
+
+sst::sst($regexs exprs):$regexs(exprs){}
+sst::operator std::__cxx11::string()const {
+    if( size() == 0 ) die("empty cat list");
+    for( auto sub : *this ) if( !sub ) die("invalid cat unit");
+    std::string ret = m_name?"(":"(?:";
+    for( auto sub : *this ) ret += (std::string)*sub + "(?:\\s+)";
+    ret += ")";
+    return ret;
+}
+chainz<cname> sst::captures()const {
+    chainz<cname> ret;
+    if( m_name ) ret << m_name;
+    for( auto sub : *this ) ret += sub->captures();
     return ret;
 }
 

@@ -39,57 +39,137 @@ struct raw : public regex {
     chainz<cname> captures()const override;
 };
 
-struct optional : public regex {
+/**
+ * @struct opt : optional */
+struct opt : public regex {
 
     $regex sub;
 
-    optional($regex re = nullptr);
+    opt($regex re = nullptr);
 
     operator std::string()const override;
 
     chainz<cname> captures()const override;
 };
 
-struct options : public regex, public $regexs {
+/**
+ * @struct ops : options */
+struct ops : public regex, public $regexs {
 
     template<typename ...Args>
-    options(Args... args){(construct(-1,args), ...);}
-    options($regexs exprs = {});
+    ops(Args... args){(construct(-1,args), ...);}
+    ops($regexs exprs = {});
 
     operator std::string()const override;
 
     chainz<cname> captures()const override;
 };
 
-struct kleene : public regex {
+struct any : public regex {
 
     $regex sub;
 
-    kleene($regex expr = nullptr);
+    any($regex expr = nullptr);
 
     operator std::string()const override;
 
     chainz<cname> captures()const override;
-};using any = kleene;
+};
 
-struct positive : public regex {
+struct one : public regex {
 
     $regex sub;
 
-    positive($regex expr = nullptr);
+    one($regex expr = nullptr);
 
     operator std::string()const override;
 
     chainz<cname> captures()const override;
-};using one = positive;
+};
 
-struct cat : public regex {
+/**
+ * @struct apo : look ahead positive */
+struct apo : public regex {
 
-    $regexs subs;
+    $regex sub;
+
+    apo($regex expr = nullptr);
+
+    operator std::string()const override;
+
+    chainz<cname> captures()const override;
+};
+
+/**
+ * @struct ane : look ahead negative */
+struct ane : public regex {
+
+    $regex sub;
+
+    ane($regex expr = nullptr);
+
+    operator std::string()const override;
+
+    chainz<cname> captures()const override;
+};
+
+/**
+ * @struct bpo : look back positive */
+struct bpo : public regex {
+
+    $regex sub;
+
+    bpo($regex expr = nullptr);
+
+    operator std::string()const override;
+
+    chainz<cname> captures()const override;
+};
+
+/**
+ * @struct bne : look back negative */
+struct bne : public regex {
+
+    $regex sub;
+
+    bne($regex expr = nullptr);
+
+    operator std::string()const override;
+
+    chainz<cname> captures()const override;
+};
+
+struct cat : public regex, public $regexs {
 
     template<typename ...Args>
-    cat(Args... args){(subs.construct(-1,args), ...);}
+    cat(Args... args){(construct(-1,args), ...);}
     cat($regexs exprs = {});
+
+    operator std::string()const override;
+
+    chainz<cname> captures()const override;
+};
+
+/**
+ * @struct sat : space saperated cat, spaces are optional */
+struct sat : public regex, public $regexs {
+
+    template<typename ...Args>
+    sat(Args ... args){(construct(-1,args), ...);}
+    sat($regexs exprs = {});
+
+    operator std::string()const override;
+
+    chainz<cname> captures()const override;
+};
+
+/**
+ * @struct sst : space saperated cat, spaces are necessary */
+struct sst : public regex, public $regexs {
+
+    template<typename ...Args>
+    sst(Args ... args){(construct(-1,args), ...);}
+    sst($regexs exprs = {});
 
     operator std::string()const override;
 
@@ -107,13 +187,17 @@ r::name* name(Args&& ...args) {\
 }
 
 def_regex(raw)
-def_regex(optional)
-def_regex(options)
-def_regex(kleene)
+def_regex(opt)
+def_regex(ops)
 def_regex(any)
-def_regex(positive)
 def_regex(one)
 def_regex(cat)
+def_regex(sat)
+def_regex(sst)
+def_regex(apo)
+def_regex(ane)
+def_regex(bpo)
+def_regex(bne)
 
 #undef def_regex
 

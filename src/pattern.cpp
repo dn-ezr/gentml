@@ -22,6 +22,10 @@ match::operator json()const {
     if( m_comment.size() ) obj["comment"] = m_comment;
     obj["match"] = *expr;
     if( m_name ) obj["name"] = *m_name;
+    /*if( m_patterns.size() ) {
+        json& jpts = obj["patterns"] = json(json::array);
+        for( auto pt : m_patterns ) jpts[jpts.count()] = *pt;
+    }*/
 
     if( auto cp = expr->captures(); cp.size() ) {
         json& jcp = obj["captures"] = json(json::object);
@@ -36,6 +40,10 @@ match* match::name(cname cn) {
     m_name = cn;
     return this;
 }
+/*match* match::patterns($patterns pts ) {
+    m_patterns = pts;
+    return this;
+}*/
 
 range::operator json()const {
     if( !m_begin ) die("begin expression missing");

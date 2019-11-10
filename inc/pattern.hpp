@@ -40,6 +40,7 @@ namespace gentml::p {
 struct match : public pattern {
 
     $regex expr;
+    // $patterns m_patterns;
     cname m_name;
 
     match( $regex m = nullptr );
@@ -49,6 +50,10 @@ struct match : public pattern {
     /**
      * @method name : 设置模式名称 */
     match* name( cname cn );
+
+    /**
+     * @method patterns : 设置内部匹配模式 */
+    // match* patterns( $patterns pts );
 };
 
 struct range : public pattern {

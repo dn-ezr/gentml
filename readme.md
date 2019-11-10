@@ -45,18 +45,30 @@ There are several classes inherits the class `regex`. Which are defined in the n
 - `gentml::r::raw`
   
   Used to represent the raw regular expression.
-- `gentml::r::optional`
+- `gentml::r::opt`
   
   Used to represent a section of regular expression matchs an optional unit.
-- `gentml::r::options`
+- `gentml::r::ops`
   
   Used to represent a section of regular expression matchs one or more options.
-- `gentml::r::kleene`
+- `gentml::r::any`
   
   Use the suffix `*` to make the unit can be matched for any times.
-- `gentml::r::positive`
+- `gentml::r::one`
   
   Use the suffix `+` to make the unit can be matched for one or more times.
+- `gentml::r::apo`
+
+  Uncaptured group, look ahead positive assert: `(?=xxxx)`.
+- `gentml::r::ane`
+
+  Uncaptured group, look ahead negative assert: `(?!xxxx)`.
+- `gentml::r::bpo`
+
+  Uncaptured group, look back positive assert: `(?<=xxxx)`.
+- `gentml::r::bne`
+
+  Uncaptured group, look back negative assert: `(?<!xxxx)`.
 - `gentml::r::cat`
   
   Used to link regular expressions together.
