@@ -15,12 +15,13 @@ pattern* pattern::comment(const std::string& c ) {
 
 namespace gentml::p {
 
-match::match($regex ex):expr(ex){}
+match::match($regex ex):expr(ex),m_name(nullptr){}
 match::match(const std::string& str ):match(raw(str)){}
 match::operator json()const {
     if( !expr ) die("expression missing");
     json obj = json::object;
     if( m_comment.size() ) obj["comment"] = m_comment;
+    auto sexpr = (std::string)*expr;
     obj["match"] = *expr;
     if( m_name ) obj["name"] = *m_name;
     /*if( m_patterns.size() ) {

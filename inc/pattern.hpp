@@ -61,8 +61,8 @@ struct range : public pattern {
     
     $regex m_begin;
     $regex m_end;
-    cname m_name;
-    cname m_contentName;
+    cname m_name = nullptr;
+    cname m_contentName = nullptr;
     $patterns m_patterns;
 
     operator json()const override;
