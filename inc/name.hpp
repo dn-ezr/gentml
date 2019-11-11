@@ -89,7 +89,6 @@ def_name( "", entity,
         def_name( "entity.name", trait )
         def_name( "entity.name", interface )
         def_name( "entity.name", impl )
-        def_name( "entity.name", type )
         def_name( "entity.name", function,
             def_name( "entity.name.function", constructor)
             def_name( "entity.name.function", destructor)) // the name of a function.
