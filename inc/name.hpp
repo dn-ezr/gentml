@@ -1,6 +1,11 @@
 #ifndef __name__
 #define __name__
 
+/**
+ * reference :
+ *  https://sublimetext.com/docs/3/scope_naming.html
+ */
+
 #include <string>
 
 #define def_name( p, name, args... ) struct : public cname_t {\
@@ -46,11 +51,27 @@ def_name( "", comment,
 /**
  * various forms of constants.*/
 def_name( "", constant,
-    def_name( "constant", numberic) // those which represent numbers, e.g. 42, 1.3f, 0x4AB1U.
+    def_name( "constant", numberic, // those which represent numbers, e.g. 42, 1.3f, 0x4AB1U.
+        def_name("constant.numberic", integer,
+            def_name("constant.numberic.integer", binary)
+            def_name("constant.numberic.integer", octal)
+            def_name("constant.numberic.integer", decimal)
+            def_name("constant.numberic.integer", hexadecimal)
+            def_name("constant.numberic.integer", other))
+        def_name_s("constant.numberic", "float", floa,
+            def_name("constant.numeric.float", binary)
+            def_name("constant.numeric.float", octal)
+            def_name("constant.numeric.float", decimal)
+            def_name("constant.numeric.float", hexadecimal)
+            def_name("constant.numeric.float", other))
+        def_name("constant.numeric", complex,
+            def_name("constant.numeric.complex", real)
+            def_name("constant.numeric.complex", imaginary)))
     def_name( "constant", character, // those which represent characters, e.g. &lt;, \e, \031.
         def_name( "constant.character", escape)) // escape sequences like \e would be constant.character.escape.
     def_name( "constant", language) // constants (generally) provided by the language which are “special” like true, false, nil, YES, NO, etc.
-    def_name( "constant", other)) // other constants, e.g. colors in CSS.
+    def_name( "constant", other, // other constants, e.g. colors in CSS.
+        def_name("constant.other", placeholder)))
 
 /**
  * entity —— an entity refers to a larger part of the document
@@ -60,10 +81,24 @@ def_name( "", constant,
  * we would use entity.name.section for the chapter title. */
 def_name( "", entity, 
     def_name( "entity", name, // we are naming the larger entity.
-        def_name( "entity.name", function) // the name of a function.
+        def_name_s( "entity.name", "class", clas,
+            def_name_s("entity.name.class", "forward-decl", forward_decl))
+        def_name_s( "entity.name", "struct", struc )
+        def_name_s( "entity.name", "enum", enu )
+        def_name_s( "entity.name", "union", unio )
+        def_name( "entity.name", trait )
+        def_name( "entity.name", interface )
+        def_name( "entity.name", impl )
+        def_name( "entity.name", type )
+        def_name( "entity.name", function,
+            def_name( "entity.name.function", constructor)
+            def_name( "entity.name.function", destructor)) // the name of a function.
         def_name( "entity.name", type) // the name of a type declaration or class.
         def_name( "entity.name", tag) // a tag name.
-        def_name( "entity.name", section)) // the name is the name of a section/heading.
+        def_name( "entity.name", section) // the name is the name of a section/heading.
+        def_name( "entity.name", constant)
+        def_name( "entity.name", label)
+        def_name_s( "entity.name", "namespace", namespac))
     def_name( "entity", other, // other entities.
         def_name_s( "entity.other", "inherited-class", inherited_class )// the superclass/baseclass name.
         def_name_s( "entity.other", "attribute-name", attribute_name )) // the name of an attribute (mainly in tags).
@@ -78,8 +113,15 @@ def_name( "", invalid,
 /**
  * keywords (when these do not fall into the other groups). */
 def_name( "", keyword,
-    def_name( "keyword", control) // mainly related to flow control like continue, while, return, etc.
-    def_name_s( "keyword", "operator", operato) // operators can either be textual (e.g. or) or be characters.
+    def_name( "keyword", control, // mainly related to flow control like continue, while, return, etc.
+        def_name("keyword.control", conditional)
+        def_name("keyword.control", import))
+    def_name_s( "keyword", "operator", operato, // operators can either be textual (e.g. or) or be characters.
+        def_name("keyword.operator", assignment)
+        def_name("keyword.operator", arithmetic)
+        def_name("keyword.operator", bitwise)
+        def_name("keyword.operator", logical)
+        def_name("keyword.operator", word))
     def_name( "keyword", other)) // other keywords.
 
 /**
@@ -90,11 +132,15 @@ def_name( "", markup,
     def_name( "markup", bold) // bold text (text which is strong and similar should preferably be derived from this name).
     def_name( "markup", heading) // a section header. Optionally provide the heading level as the next element, for example markup.heading.2.html for <h2>…</h2> in HTML.
     def_name( "markup", italic) // italic text (text which is emphasized and similar should preferably be derived from this name).
+    def_name( "markup", inserted)
+    def_name( "markup", deleted)
     def_name( "markup", list, // list items.
         def_name( "markup.list", numbered) // numbered list items.
         def_name( "markup.list", unnumbered)) // unnumbered list items.
     def_name( "markup", quote) // quoted (sometimes block quoted) text.
-    def_name( "markup", raw) // text which is verbatim, e.g. code listings. Normally spell checking is disabled for markup.raw.
+    def_name( "markup", raw, // text which is verbatim, e.g. code listings. Normally spell checking is disabled for markup.raw.
+        def_name_s("markup.raw", "inline", inlin)
+        def_name("markup.raw", block))
     def_name( "markup", other))
 
 /**
@@ -103,12 +149,83 @@ def_name( "", markup,
  * storage.type, entity.name.function, variable.parameter etc. and only the latter would be styled. 
  * Sometimes the meta part of the scope will be used only to limit the more general element that is styled, most of the time meta scopes are however used in scope selectors for activation of bundle items. 
  * For example in Objective-C there is a meta scope for the interface declaration of a class and the implementation, allowing the same tab-triggers to expand differently, depending on context. */
-def_name( "", meta)
+def_name( "", meta,
+    def_name_s("meta", "class", clas )
+    def_name_s("meta", "struct", struc )
+    def_name_s("meta", "enum", enu )
+    def_name_s("meta", "union", unio )
+    def_name("meta", trait )
+    def_name("meta", interface )
+    def_name("meta", impl )
+    def_name("meta", type )
+    def_name("meta", function,
+        def_name("meta.function", parameters)
+        def_name_s("meta.function", "return-type", return_type))
+    def_name_s("meta", "namespace", namespac)
+    def_name("meta", preprocessor)
+    def_name("meta", annotation,
+        def_name("meta.annotation", identifier)
+        def_name("meta.annotation", parameters))
+    def_name("meta", path)
+    def_name_s("meta", "function-call", function_call)
+    def_name("meta", block)
+    def_name("meta", braces)
+    def_name("meta", group)
+    def_name("meta", parens)
+    def_name("meta", brackets)
+    def_name("meta", generic)
+    def_name("meta", tag)
+    def_name("meta", paragraph)
+    def_name_s("meta", "toc-list", toc_list))
+
+def_name( "", punctuation,
+    def_name("punctuation", separator,
+        def_name("punctuation.separator", continuation))
+    def_name("punctuation", terminator)
+    def_name("punctuation", accessor)
+    def_name("punctuation", definition,
+        def_name("punctuation.definition", comment)
+        def_name("punctuation.definition", keyword)
+        def_name("punctuation.definition", annotation)
+        def_name("punctuation.definition", variable)
+        def_name("punctuation.definition", string,
+            def_name("punctuation.definition.string", begin)
+            def_name("punctuation.definition.string", end))
+        def_name("punctuation.definition", generic,
+            def_name("punctuation.definition.generic", begin)
+            def_name("punctuation.definition.generic", end)))
+    def_name("punctuation", section,
+        def_name("punctuation.section", block,
+            def_name("punctuation.section.block", begin)
+            def_name("punctuation.section.block", end))
+        def_name("punctuation.section", braces,
+            def_name("punctuation.section.braces", begin)
+            def_name("punctuation.section.braces", end))
+        def_name("punctuation.section", group,
+            def_name("punctuation.section.group", begin)
+            def_name("punctuation.section.group", end))
+        def_name("punctuation.section", parens,
+            def_name("punctuation.section.parens", begin)
+            def_name("punctuation.section.parens", end))
+        def_name("punctuation.section", brackets,
+            def_name("punctuation.section.brackets", begin)
+            def_name("punctuation.section.brackets", end))
+        def_name("punctuation.section", interpolation,
+            def_name("punctuation.section.interpolation", begin)
+            def_name("punctuation.section.interpolation", end))))
 
 /**
  *  things relating to “storage”. */
 def_name( "", storage,
-    def_name( "storage", type) // the type of something, class, function, int, var, etc.
+    def_name( "storage", type,
+        def_name_s("storge.type", "function", function)
+        def_name_s("storge.type", "class", clas)
+        def_name_s("storge.type", "struct", struc)
+        def_name_s("storge.type", "enum", enu)
+        def_name_s("storge.type", "union", unio)
+        def_name_s("storge.type", "trait", trait)
+        def_name_s("storge.type", "interface", interface)
+        def_name_s("storge.type", "impl", impl) ) // the type of something, class, function, int, var, etc.
     def_name( "storage", modifier)) // a storage modifier like static, final, abstract, etc.
 
 /**
@@ -128,6 +245,7 @@ def_name( "", string,
  * things provided by a framework or library should be below support. */
 def_name("", support,
     def_name( "support", function) // functions provided by the framework/library. For example NSLog in Objective-C is support.function.
+    def_name( "support", module)
     def_name_s( "support", "class", clas) // when the framework/library provides classes.
     def_name( "support", type) // types provided by the framework/library, this is probably only used for languages derived from C, which has typedef (and struct). Most other languages would introduce new types as classes.
     def_name( "support", constant) // constants (magic values) provided by the framework/library.
@@ -139,7 +257,12 @@ def_name("", support,
 def_name( "", variable,
     def_name( "variable", parameter) // when the variable is declared as the parameter.
     def_name( "variable", language) // reserved language variables like this, super, self, etc.
-    def_name( "variable", other)) // other variables, like $some_variables.
+    def_name( "variable", other, // other variables, like $some_variables.
+        def_name("variable.other", readwrite)
+        def_name("variable.other", constant)
+        def_name("variable.other", member))
+    def_name("variable", function)
+    def_name("variable", annotation))
 }
 
 #undef def_name
