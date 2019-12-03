@@ -101,7 +101,7 @@ range* range::contentName(cname cn) {
     return this;
 }
 range* range::patterns($patterns pts ) {
-    m_patterns = pts;
+    m_patterns += pts;
     return this;
 }
 
