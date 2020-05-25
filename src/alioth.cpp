@@ -11,7 +11,7 @@ Alioth::Alioth() {
     patterns = {
         include("#comments"),
         include("#signature"),
-        include("#global-definitions"),
+        include("#definitions"),
         include("#implementations")
     };
 
@@ -19,8 +19,7 @@ Alioth::Alioth() {
         {"comments",comments()},
         {"signature",signature()},
         {"dependencies",dependencies()},
-        {"global-definitions",global_definitions()},
-        {"inner-definitions",inner_definitions()},
+        {"definitions",definitions()},
         {"implementations",implementations()}
     };
 }
@@ -115,20 +114,15 @@ $patterns Alioth::dependencies() {
     };
 }
 
-$patterns Alioth::global_definitions() {
+$patterns Alioth::definitions() {
     return {
         class_definition(),
+        operator_definition(),
+        delete_operator(),
         alias_definition(),
-        enum_definition()
-    };
-}
-
-$patterns Alioth::inner_definitions() {
-    return {
+        enum_definition(),
         attr_definition(),
         method_definition(),
-        delete_operator(),
-        operator_definition(),
     };
 }
 
@@ -167,8 +161,7 @@ $pattern Alioth::class_definition() {
                     raw("\\}")->name(&n::punctuation.section.block.end))
                 ->patterns({
                     include("#comments"),
-                    include("#inner-definitions"),
-                    include("#global-definitions"),
+                    include("#definitions"),
                     match(etypes())->name(&n::support.type),
                     match(dtypes())->name(&n::storage.type),
                     match(scopes()),
@@ -234,11 +227,12 @@ $pattern Alioth::method_definition() {
             sat(
                 bnd("method")->name(&n::punctuation.definition.generic),
                 any(
-                    ops(
-                        visibilities(),
-                        bnd("const"),
-                        bnd("atomic"),
-                        bnd("meta")))->name(&n::storage.modifier),
+                    sat(
+                        ops(
+                            visibilities(),
+                            bnd("const"),
+                            bnd("atomic"),
+                            bnd("meta"))))->name(&n::storage.modifier),
                 label()->name(&n::entity.name.function),
                 raw("\\(")->name(&n::punctuation.section.parens.begin)))
         ->end(raw("\\)")->name(&n::punctuation.section.parens.end))
@@ -260,7 +254,6 @@ $pattern Alioth::operator_definition() {
                 bnd("operator")->name(&n::punctuation.definition.generic),
                 opt(
                     ops(
-                        visibilities(),
                         bnd("default"),
                         bnd("const"),
                         bnd("prefix"),
@@ -271,7 +264,8 @@ $pattern Alioth::operator_definition() {
                 raw("\\(")->name(&n::punctuation.section.parens.begin)))
         ->end(
             raw("\\)")->name(&n::punctuation.section.parens.end))
-        ->patterns(parameter_list());
+        ->patterns(
+            parameter_list());
 }
 
 $pattern Alioth::method_implementation() {
@@ -372,6 +366,10 @@ $patterns Alioth::parameter_list() {
                         bnd("const")->name(&n::storage.modifier),
                         etypes()->name(&n::support.type))),
                 label()->name(&n::variable.parameter),
+                any(
+                    ops(
+                        "\\*",
+                        "\\^"))->name(&n::storage.modifier),
                 opt(
                     ops(
                         dtypes()->name(&n::storage.type),
@@ -513,7 +511,7 @@ $regex Alioth::def() {
 }
 
 $regex Alioth::oplabels() {
-    return sst(
+    return ops(
         "\\+",
         "\\-",
         "\\*",

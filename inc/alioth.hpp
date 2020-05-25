@@ -14,8 +14,7 @@ class Alioth : public Tml {
         $patterns comments();
         $patterns signature();
         $patterns dependencies();
-        $patterns global_definitions();
-        $patterns inner_definitions();
+        $patterns definitions();
         $patterns implementations();
         $pattern class_definition();
         $pattern attr_definition();
